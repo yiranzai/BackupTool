@@ -1,5 +1,13 @@
+<!--
+ * @Author: yiranzai wuqingdzx@gmail.com
+ * @Date: 2024-07-12 20:25:47
+ * @LastEditors: yiranzai wuqingdzx@gmail.com
+ * @LastEditTime: 2024-07-13 01:03:57
+ * @FilePath: /tauri-test/src/components/HelloWorld.vue
+ * @Description: 这是默认设置,请设置`customMade`, 打开koroFileHeader查看配置 进行设置: https://github.com/OBKoro1/koro1FileHeader/wiki/%E9%85%8D%E7%BD%AE
+-->
 <script setup lang="ts">
-import { invoke } from '@tauri-apps/api/tauri'
+import { invoke } from "@tauri-apps/api/tauri"
 defineProps<{ msg: string }>()
 
 const count = ref(0)
