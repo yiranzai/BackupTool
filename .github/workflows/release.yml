@@ -78,7 +78,7 @@ jobs:
           releaseName: "App v__VERSION__"
           releaseBody: "See the assets to download this version and install."
           releaseDraft: true
-          prerelease: false
+          prerelease: true
           args: ${{ matrix.args }}
 
           # 生成静态资源并将其推送到 github pages
@@ -111,6 +111,10 @@ jobs:
 
     steps:
       - uses: actions/checkout@v2
+      - uses: pnpm/action-setup@v2
+        with:
+          version: 9
+          run_install: true
       - run: pnpm
       - run: pnpm updater
         env:
