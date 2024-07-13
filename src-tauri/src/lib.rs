@@ -4,7 +4,7 @@ use showfile;
 use std::{fs, io, path::Path, string::String};
 use tauri::{
     menu::{MenuBuilder, MenuItemBuilder, SubmenuBuilder},
-    Manager, Runtime, State,
+    Manager,
 };
 use tauri_plugin_autostart::MacosLauncher;
 use tauri_plugin_autostart::ManagerExt;
