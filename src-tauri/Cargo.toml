@@ -4,7 +4,7 @@ version = "0.0.1"
 description = "A Tauri App"
 authors = ["yiranzai"]
 license = "MIT"
-repository = "https://github.com/yiranzai/tauri-test"
+repository = "https://github.com/yiranzai/BackupTool"
 default-run = "backup_tool"
 edition = "2021"
 

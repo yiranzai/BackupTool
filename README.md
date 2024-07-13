@@ -51,7 +51,7 @@ pnpm test
 
 ### 后端（Rust, Cargo）
 
-后端代码位于 [`src-tauri/`](command:_github.copilot.openRelativePath?%5B%7B%22scheme%22%3A%22file%22%2C%22authority%22%3A%22%22%2C%22path%22%3A%22%2FUsers%2Fyiranzai%2Fwork%2Frust%2Ftauri-test%2Fsrc-tauri%2F%22%2C%22query%22%3A%22%22%2C%22fragment%22%3A%22%22%7D%5D "/Users/yiranzai/work/rust/tauri-test/src-tauri/") 目录（以下命令需在该目录下运行）。
+后端代码位于 [`src-tauri/`](command:_github.copilot.openRelativePath?%5B%7B%22scheme%22%3A%22file%22%2C%22authority%22%3A%22%22%2C%22path%22%3A%22%2FUsers%2Fyiranzai%2Fwork%2Frust%2FBackupTool%2Fsrc-tauri%2F%22%2C%22query%22%3A%22%22%2C%22fragment%22%3A%22%22%7D%5D "/Users/yiranzai/work/rust/BackupTool/src-tauri/") 目录（以下命令需在该目录下运行）。
 
 #### 查找过时的 Rust 依赖
 
