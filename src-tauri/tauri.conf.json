@@ -5,7 +5,10 @@
     "windows": {
       "certificateThumbprint": null,
       "digestAlgorithm": "sha256",
-      "timestampUrl": ""
+      "timestampUrl": "",
+      "wix": {
+        "language": "zh-CN"
+      }
     },
     "icon": [
       "icons/32x32.png",
@@ -40,17 +43,24 @@
     "beforeDevCommand": "pnpm vite:dev",
     "devUrl": "http://localhost:1420"
   },
-  "productName": "Tauri Vue Template",
-  "version": "0.4.0",
+  "productName": "BackupTool",
+  "version": "0.0.1",
   "identifier": "net.uninen.dev",
-  "plugins": {},
+  "plugins": {
+    "updater": {
+      "pubkey": "dW50cnVzdGVkIGNvbW1lbnQ6IG1pbmlzaWduIHB1YmxpYyBrZXk6IENFMzE1NzhGQUEwQjI0RkEKUldUNkpBdXFqMWN4emwrNUc0MElBR1o0OEptcy9vRUZvVmNuUis3MlN0THVLV0daY2dlUGpzeEoK",
+      "endpoints": [
+        "https://github.com/yiranzai/tauri-test/releases/latest/download/latest.json"
+      ]
+    }
+  },
   "app": {
     "security": {
       "csp": null
     },
     "windows": [
       {
-        "title": "Tauri Vue Template",
+        "title": "BackupTool",
         "width": 800,
         "height": 600,
         "resizable": true,

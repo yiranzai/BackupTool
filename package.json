@@ -1,7 +1,7 @@
 {
   "name": "tauri-vue-template",
   "private": true,
-  "version": "0.4.0",
+  "version": "0.0.1",
   "type": "module",
   "scripts": {
     "dev": "cross-env RUST_BACKTRACE=1 concurrently -k \"tauri dev\" \"pnpm devtools\"",
@@ -12,16 +12,24 @@
     "devtools": "pnpm vue-devtools",
     "ts-check": "vue-tsc --noEmit",
     "preview": "vite preview",
-    "check": "cd src-tauri && cargo check"
+    "check": "cd src-tauri && cargo check",
+    "updater": "node scripts/updater.mjs",
+    "release": "node scripts/release.mjs"
   },
   "dependencies": {
-    "@tauri-apps/api": "1.6.0",
+    "@tauri-apps/api": "2.0.0-beta.14",
     "@tauri-apps/plugin-dialog": "2.0.0-beta.6",
+    "@tauri-apps/plugin-fs": "2.0.0-beta.7",
     "@tauri-apps/plugin-http": "2.0.0-beta.7",
+    "@tauri-apps/plugin-log": "2.0.0-beta.8",
+    "@tauri-apps/plugin-os": "2.0.0-beta.6",
+    "@tauri-apps/plugin-shell": "2.0.0-beta.8",
+    "@tauri-apps/plugin-updater": "2.0.0-beta.7",
     "vue": "3.4.26"
   },
   "devDependencies": {
-    "@eslint/js": "^9.6.0",
+    "@actions/github": "^6.0.0",
+    "@eslint/js": "^9.7.0",
     "@tauri-apps/cli": "2.0.0-beta.21",
     "@types/node": "20.14.2",
     "@vitejs/plugin-vue": "5.0.4",
@@ -30,12 +38,13 @@
     "autoprefixer": "10.4.19",
     "concurrently": "8.2.2",
     "cross-env": "7.0.3",
-    "eslint": "^9.6.0",
+    "eslint": "^9.7.0",
     "eslint-config-prettier": "9.1.0",
     "eslint-plugin-n": "17.9.0",
     "eslint-plugin-security": "3.0.0",
     "eslint-plugin-vue": "9.27.0",
     "globals": "^15.8.0",
+    "node-fetch": "^3.3.2",
     "postcss": "8.4.38",
     "postcss-import": "16.1.0",
     "postcss-nesting": "12.1.2",
