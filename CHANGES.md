@@ -1,4 +1,20 @@
+<!--
+ * @Author: yiranzai wuqingdzx@gmail.com
+ * @Date: 2024-07-13 20:56:56
+ * @LastEditors: yiranzai wuqingdzx@gmail.com
+ * @LastEditTime: 2024-07-14 01:23:36
+ * @FilePath: /BackupTool/CHANGES.md
+ * @Description: 这是默认设置,请设置`customMade`, 打开koroFileHeader查看配置 进行设置: https://github.com/OBKoro1/koro1FileHeader/wiki/%E9%85%8D%E7%BD%AE
+-->
 # Changelog
+
+## v0.0.3
+
+- **开机启动**: 增加了开机启动功能
+
+## v0.0.2
+
+- **处理流水线**: 处理优化流水线
 
 ## v0.0.1
 

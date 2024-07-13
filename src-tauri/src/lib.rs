@@ -4,8 +4,10 @@ use showfile;
 use std::{fs, io, path::Path, string::String};
 use tauri::{
     menu::{MenuBuilder, MenuItemBuilder, SubmenuBuilder},
-    Manager,
+    Manager, Runtime, State,
 };
+use tauri_plugin_autostart::MacosLauncher;
+use tauri_plugin_autostart::ManagerExt;
 use tauri_plugin_log::{Target, TargetKind};
 use tauri_plugin_shell::ShellExt;
 
@@ -87,9 +89,35 @@ fn show_in_folder(path: String) {
     showfile::show_path_in_file_manager(path);
 }
 
+fn switch_startup_status(
+    mn: &tauri::State<'_, tauri_plugin_autostart::AutoLaunchManager>,
+    show: bool,
+) -> &'static str {
+    let mut enabled = mn.is_enabled().unwrap();
+    if show {
+        if enabled {
+            mn.disable().expect("disable failed");
+        } else {
+            mn.enable().expect("enable failed");
+        }
+        enabled = !enabled
+    }
+    let status = if enabled {
+        "关闭开机启动"
+    } else {
+        "打开开机启动"
+    };
+    println!("AutoLaunch status: {}", status);
+    return status;
+}
+
 pub fn run() {
     let ctx = tauri::generate_context!();
     tauri::Builder::default()
+        .plugin(tauri_plugin_autostart::init(
+            MacosLauncher::LaunchAgent,
+            Some(vec!["--flag1", "--flag2"]),
+        ))
         .plugin(tauri_plugin_log::Builder::new().build())
         .plugin(tauri_plugin_fs::init())
         .plugin(tauri_plugin_updater::Builder::new().build())
@@ -104,22 +132,59 @@ pub fn run() {
                 ])
                 .build(),
         )
-        .invoke_handler(tauri::generate_handler![show_in_folder, copy_dir, save_json_string, load_json_string])
+        .invoke_handler(tauri::generate_handler![
+            show_in_folder,
+            copy_dir,
+            save_json_string,
+            load_json_string
+        ])
         .plugin(tauri_plugin_shell::init())
         .setup(|app| {
-            let cust_menu =
-                MenuItemBuilder::with_id("Online Documentation", "Online Documentation")
-                    .build(app)?;
-            let sub_menu = SubmenuBuilder::new(app, "Help").item(&cust_menu).build()?;
-            let menu = MenuBuilder::new(app).item(&sub_menu).build()?;
+            let autostart_manager = app.autolaunch();
+
+            let cust_menu = MenuItemBuilder::with_id("Tauri Doc", "Tauri Doc").build(app)?;
+
+            let update_menu = MenuItemBuilder::with_id("Check Update", "检查更新").build(app)?;
+
+            let switch_startup =
+                MenuItemBuilder::with_id("Switch Startup", "检查开机启动...").build(app)?;
+
+            switch_startup
+                .set_text(switch_startup_status(&autostart_manager, false))
+                .expect("set text failed");
+
+            let sub_menu = SubmenuBuilder::new(app, "帮助")
+                .items(&[&cust_menu, &update_menu])
+                .build()?;
+
+            let main_menu = SubmenuBuilder::with_id(app, "main_menu", "主菜单")
+                .items(&[&switch_startup])
+                .build()?;
+
+            let menu = MenuBuilder::new(app)
+                .items(&[&main_menu, &sub_menu])
+                .build()?;
 
             app.set_menu(menu)?;
 
             app.on_menu_event(move |app, event| {
+                let autostart_manager = app.autolaunch();
                 if event.id() == cust_menu.id() {
                     let _ = app
                         .shell()
                         .open("https://github.com/tauri-apps/tauri", None);
+                } else if event.id() == switch_startup.id() {
+                    switch_startup
+                        .set_text(switch_startup_status(&autostart_manager, true))
+                        .expect("set text failed");
+                } else if event.id() == main_menu.id() {
+                    switch_startup
+                        .set_text(switch_startup_status(&autostart_manager, false))
+                        .expect("set text failed");
+                } else if event.id() == update_menu.id() {
+                    let _ = app
+                        .shell()
+                        .open("https://github.com/yiranzai/BackupTool/releases", None);
                 }
             });
 

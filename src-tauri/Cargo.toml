@@ -1,6 +1,6 @@
 [package]
 name = "backup_tool"
-version = "0.0.1"
+version = "0.0.3"
 description = "A Tauri App"
 authors = ["yiranzai"]
 license = "MIT"
@@ -26,6 +26,7 @@ tauri-plugin-fs = "2.0.0-beta.11"
 chrono = { version = "0.4.38", features = [] }
 tauri-plugin-updater = "2.0.0-beta.10"
 tauri-plugin-log = "2.0.0-beta.8"
+tauri-plugin-autostart = "2.0.0-beta.9"
 
 [features]
 # by default Tauri runs in production mode

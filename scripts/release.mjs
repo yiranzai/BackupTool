@@ -2,7 +2,7 @@
  * @Author: yiranzai wuqingdzx@gmail.com
  * @Date: 2024-07-13 22:15:09
  * @LastEditors: yiranzai wuqingdzx@gmail.com
- * @LastEditTime: 2024-07-13 22:21:32
+ * @LastEditTime: 2024-07-14 01:24:58
  * @FilePath: /BackupTool/scripts/release.mjs
  * @Description: 这是默认设置,请设置`customMade`, 打开koroFileHeader查看配置 进行设置: https://github.com/OBKoro1/koro1FileHeader/wiki/%E9%85%8D%E7%BD%AE
  */
@@ -18,6 +18,8 @@ const require = createRequire(import.meta.url);
 
 async function release() {
   const flag = process.argv[2] ?? 'patch';
+  let nextVersion = "0.0.0";
+
   const packageJson = require('../package.json');
   let [a, b, c] = packageJson.version.split('.').map(Number);
 
@@ -35,7 +37,7 @@ async function release() {
     process.exit(1);
   }
 
-  const nextVersion = `${a}.${b}.${c}`;
+  nextVersion = `${a}.${b}.${c}`;
   packageJson.version = nextVersion;
 
   const nextTag = `v${nextVersion}`;

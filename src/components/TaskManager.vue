@@ -177,6 +177,7 @@ import { defineComponent, ref } from "vue";
 import { open } from "@tauri-apps/plugin-dialog";
 import { invoke } from "@tauri-apps/api/core";
 import { attachConsole } from "@tauri-apps/plugin-log";
+import { isEnabled } from "@tauri-apps/plugin-autostart";
 
 // 定义 Task 对象类型
 type Task = {
@@ -538,7 +539,16 @@ export default defineComponent({
       return date.toLocaleString();
     };
 
-    onMounted(loadDirs, loadTasks);
+    async function isEnabledLog() {
+      // 检查 enable 状态
+      console.log(`registered for autostart? ${await isEnabled()}`);
+    }
+
+    onMounted(() => {
+      loadDirs();
+      loadTasks();
+      isEnabledLog();
+    });
 
     // 定期检查有没有要执行的任务
     setInterval(autuRunTasks, 5000);
