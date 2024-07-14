@@ -8,6 +8,10 @@
 -->
 # Changelog
 
+## v0.0.4
+
+- **更换存储组件**：从自己维护的json文件改为了官方[store插件](https://github.com/tauri-apps/tauri-plugin-store)
+
 ## v0.0.3
 
 - **开机启动**: 增加了开机启动功能

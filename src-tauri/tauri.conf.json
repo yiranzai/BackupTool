@@ -44,7 +44,7 @@
     "devUrl": "http://localhost:1420"
   },
   "productName": "BackupTool",
-  "version": "0.0.3",
+  "version": "0.0.4",
   "identifier": "net.uninen.dev",
   "plugins": {
     "updater": {
