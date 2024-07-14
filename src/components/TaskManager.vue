@@ -178,6 +178,7 @@ import { open } from "@tauri-apps/plugin-dialog";
 import { invoke } from "@tauri-apps/api/core";
 import { attachConsole } from "@tauri-apps/plugin-log";
 import { isEnabled } from "@tauri-apps/plugin-autostart";
+import { Store } from "@tauri-apps/plugin-store";
 
 // 定义 Task 对象类型
 type Task = {
@@ -199,6 +200,7 @@ type Task = {
 
 // 启用 TargetKind::Webview 后，这个函数将把日志打印到浏览器控制台
 const detach = await attachConsole();
+const store = new Store("store.bin");
 
 export default defineComponent({
   name: "TaskManager",
@@ -212,7 +214,7 @@ export default defineComponent({
     const weeklyTime = ref("08:00");
     const interval = ref(15);
     const intervalUnit = ref("分钟");
-    const tasks = ref<Task[]>([]);
+    let tasks = ref<Task[]>([]);
 
     const weekdays = [
       "星期一",
@@ -485,36 +487,52 @@ export default defineComponent({
       return next.getTime();
     };
 
-    const saveTaskData = () => {
-      // 将任务数据保存到本地存储或其他持久化方式
-      const data = JSON.stringify(tasks.value);
-      invoke("save_json_string", {
-        jsonData: data,
-        filePath: "tasks.json",
-      })
-        .then((dd: string) => {
-          console.log(dd);
-        })
-        .catch((error: string) => {
-          console.error(error);
-        });
-    };
+    async function saveTaskData() {
+      await store.set("task-list", tasks.value);
+      store.save();
+      // // 将任务数据保存到本地存储或其他持久化方式
+      // const data = JSON.stringify(tasks.value);
+      // invoke("save_json_string", {
+      //   jsonData: data,
+      //   filePath: "tasks.json",
+      // })
+      //   .then((dd: string) => {
+      //     console.log(dd);
+      //   })
+      //   .catch((error: string) => {
+      //     console.error(error);
+      //   });
+    }
 
-    const loadTasks = () => {
-      invoke("load_json_string", { filePath: "tasks.json" })
-        .then((dd: string) => {
-          console.log(dd);
-          tasks.value = JSON.parse(dd);
-        })
-        .catch((error: string) => {
-          console.error(error);
-        });
-      tasks.value.forEach((task: Task) => {
-        if (task.nextExecutionTimestamp === 0) {
-          task.nextExecutionTimestamp = getNextExecutionTime(task);
+    async function loadTasks() {
+      const res = await store.get<Task[]>("task-list");
+      console.table(res);
+      if (res) {
+        if (Array.isArray(res)) {
+          tasks.value = res;
+          tasks.value.forEach((task) => {
+            console.log(task.name);
+          });
         }
-      });
-    };
+      }
+      console.table(tasks);
+    }
+
+    // const loadTasks = () => {
+    //   invoke("load_json_string", { filePath: "tasks.json" })
+    //     .then((dd: string) => {
+    //       console.log(dd);
+    //       tasks.value = JSON.parse(dd);
+    //     })
+    //     .catch((error: string) => {
+    //       console.error(error);
+    //     });
+    //   tasks.value.forEach((task: Task) => {
+    //     if (task.nextExecutionTimestamp === 0) {
+    //       task.nextExecutionTimestamp = getNextExecutionTime(task);
+    //     }
+    //   });
+    // };
 
     const deleteTask = (id: number) => {
       const index = tasks.value.findIndex((t: Task) => t.id === id);
@@ -580,4 +598,5 @@ export default defineComponent({
   },
 });
 detach();
+await store.save();
 </script>
