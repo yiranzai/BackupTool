@@ -28,6 +28,7 @@
     "store:allow-set",
     "store:allow-save",
     "store:allow-load",
-    "autostart:default"
+    "autostart:default",
+    "updater:default"
   ]
 }

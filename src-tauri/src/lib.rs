@@ -3,7 +3,8 @@ use chrono::Local;
 use showfile;
 use std::{fs, io, path::Path, string::String};
 use tauri::{
-    menu::{MenuBuilder, MenuItemBuilder, SubmenuBuilder},
+    menu::{Menu, MenuBuilder, MenuItem, MenuItemBuilder, SubmenuBuilder},
+    tray::{MouseButton, MouseButtonState, TrayIconBuilder, TrayIconEvent},
     Manager,
 };
 use tauri_plugin_autostart::MacosLauncher;
@@ -11,6 +12,7 @@ use tauri_plugin_autostart::ManagerExt;
 use tauri_plugin_log::{Target, TargetKind};
 use tauri_plugin_shell::ShellExt;
 
+// 复制文件夹
 #[tauri::command]
 async fn copy_dir(source_dir: String, target_dir: String) {
     // 检查目录是否为空
@@ -30,6 +32,7 @@ async fn copy_dir(source_dir: String, target_dir: String) {
     copy_dir_recursive(&Path::new(&source_dir), &Path::new(&target_dir)).expect("copy dir failed");
 }
 
+// 存储配置
 #[tauri::command]
 fn save_json_string(json_data: &str, file_path: &str) -> Result<(), String> {
     // 将 JSON 字符串写入文件
@@ -42,6 +45,7 @@ fn save_json_string(json_data: &str, file_path: &str) -> Result<(), String> {
     }
 }
 
+// 加载配置的存储文件
 #[tauri::command]
 fn load_json_string(file_path: &str) -> Result<String, String> {
     // 从文件读取 JSON 字符串
@@ -54,11 +58,13 @@ fn load_json_string(file_path: &str) -> Result<String, String> {
     }
 }
 
+// 生成时间字符串
 fn gen_time_dir() -> String {
     let local = Local::now();
     return local.format("/%Y-%m-%d_%H-%M-%S").to_string();
 }
 
+// 递归复制文件夹
 fn copy_dir_recursive(from: &Path, to: &Path) -> Result<(), io::Error> {
     if !from.exists() {
         return Ok(());
@@ -89,6 +95,7 @@ fn show_in_folder(path: String) {
     showfile::show_path_in_file_manager(path);
 }
 
+// 切换开机状态
 fn switch_startup_status(
     mn: &tauri::State<'_, tauri_plugin_autostart::AutoLaunchManager>,
     show: bool,
@@ -111,10 +118,24 @@ fn switch_startup_status(
     return status;
 }
 
+// 展示窗口, 聚焦窗口
+fn show_window(app: &AppHandle) {
+    let windows = app.webview_windows();
+
+    windows
+        .values()
+        .next()
+        .expect("Sorry, no window found")
+        .set_focus()
+        .expect("Can't Bring Window to Focus");
+}
+
 pub fn run() {
     let ctx = tauri::generate_context!();
     tauri::Builder::default()
-        .plugin(tauri_plugin_autostart::init())
+        .plugin(tauri_plugin_single_instance::init(|app, args, cwd| {
+            let _ = show_window(app);
+        }))
         .plugin(tauri_plugin_store::Builder::new().build())
         .plugin(tauri_plugin_autostart::init(
             MacosLauncher::LaunchAgent,
@@ -142,6 +163,43 @@ pub fn run() {
         ])
         .plugin(tauri_plugin_shell::init())
         .setup(|app| {
+            // 系统托盘
+            let quit_i = MenuItem::with_id(app, "quit", "Quit", true, None::<&str>)?;
+            let menu = Menu::with_items(app, &[&quit_i])?;
+            let tray = TrayIconBuilder::new()
+                .icon(app.default_window_icon().unwrap().clone())
+                .menu(&menu)
+                .menu_on_left_click(true)
+                .on_menu_event(|app, event| match event.id.as_ref() {
+                    "quit" => {
+                        println!("quit menu item was clicked");
+                        app.exit(0);
+                    }
+                    _ => {
+                        println!("menu item {:?} not handled", event.id);
+                    }
+                })
+                .on_tray_icon_event(|tray, event| match event {
+                    TrayIconEvent::Click {
+                        button: MouseButton::Left,
+                        button_state: MouseButtonState::Up,
+                        ..
+                    } => {
+                        println!("left click pressed and released");
+                        // in this example, let's show and focus the main window when the tray is clicked
+                        let app = tray.app_handle();
+                        if let Some(window) = app.get_webview_window("main") {
+                            let _ = window.show();
+                            let _ = window.set_focus();
+                        }
+                    }
+                    _ => {
+                        println!("unhandled event {event:?}");
+                    }
+                })
+                .build(app)?;
+
+            // 开机启动
             let autostart_manager = app.autolaunch();
 
             let cust_menu = MenuItemBuilder::with_id("Tauri Doc", "Tauri Doc").build(app)?;
