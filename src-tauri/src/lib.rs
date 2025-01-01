@@ -5,7 +5,7 @@ use std::{fs, io, path::Path, string::String};
 use tauri::{
     menu::{Menu, MenuBuilder, MenuItem, MenuItemBuilder, SubmenuBuilder},
     tray::{MouseButton, MouseButtonState, TrayIconBuilder, TrayIconEvent},
-    AppHandle, Manager,
+    AppHandle, Manager
 };
 use tauri_plugin_autostart::MacosLauncher;
 use tauri_plugin_autostart::ManagerExt;
@@ -131,7 +131,6 @@ fn show_window(app: &AppHandle) {
 }
 
 pub fn run() {
-    let ctx = tauri::generate_context!();
     tauri::Builder::default()
         .plugin(tauri_plugin_opener::init())
         .plugin(tauri_plugin_single_instance::init(|app, _args, _cwd| {
@@ -166,7 +165,8 @@ pub fn run() {
         .setup(|app| {
             // 系统托盘
             let quit_i = MenuItem::with_id(app, "quit", "Quit", true, None::<&str>)?;
-            let menu = Menu::with_items(app, &[&quit_i])?;
+            let show_i = MenuItem::with_id(app, "show", "Show", true, None::<&str>)?;
+            let menu = Menu::with_items(app, &[&quit_i, &show_i])?;
             let _tray = TrayIconBuilder::new()
                 .icon(app.default_window_icon().unwrap().clone())
                 .menu(&menu)
@@ -175,6 +175,10 @@ pub fn run() {
                     "quit" => {
                         println!("quit menu item was clicked");
                         app.exit(0);
+                    }
+                    "show" => {
+                        println!("show menu item was clicked");
+                        let _ = show_window(app);
                     }
                     _ => {
                         println!("menu item {:?} not handled", event.id);
@@ -245,14 +249,29 @@ pub fn run() {
                 }
             });
 
+
+            // 关闭窗口不退出进程
+            let main_window = app.get_webview_window("main").unwrap();
+            main_window.clone().on_window_event(move|event| match event{
+                tauri::WindowEvent::CloseRequested { .. } => {
+                    println!("hide window");
+                    let _ = main_window.hide();
+                }
+                _ => {
+                    println!("unhandled event {event:?}");
+                }
+            });
+
             #[cfg(debug_assertions)]
-            {
-                let main_window = app.get_webview_window("main").unwrap();
-                main_window.open_devtools();
+            {   
+                app.get_webview_window("main").unwrap().open_devtools();
             }
 
             Ok(())
         })
-        .run(ctx)
-        .expect("error while running tauri application");
+        // .build()
+        .run(tauri::generate_context!())
+        .expect("error while running tauri application")
+        // .run(tauri::generate_context!())
+       ;
 }
