@@ -5,12 +5,12 @@ use std::{fs, io, path::Path, string::String};
 use tauri::{
     menu::{Menu, MenuBuilder, MenuItem, MenuItemBuilder, SubmenuBuilder},
     tray::{MouseButton, MouseButtonState, TrayIconBuilder, TrayIconEvent},
-    Manager,
+    AppHandle, Manager,
 };
 use tauri_plugin_autostart::MacosLauncher;
 use tauri_plugin_autostart::ManagerExt;
 use tauri_plugin_log::{Target, TargetKind};
-use tauri_plugin_shell::ShellExt;
+use tauri_plugin_opener::OpenerExt;
 
 // 复制文件夹
 #[tauri::command]
@@ -133,7 +133,8 @@ fn show_window(app: &AppHandle) {
 pub fn run() {
     let ctx = tauri::generate_context!();
     tauri::Builder::default()
-        .plugin(tauri_plugin_single_instance::init(|app, args, cwd| {
+        .plugin(tauri_plugin_opener::init())
+        .plugin(tauri_plugin_single_instance::init(|app, _args, _cwd| {
             let _ = show_window(app);
         }))
         .plugin(tauri_plugin_store::Builder::new().build())
@@ -166,7 +167,7 @@ pub fn run() {
             // 系统托盘
             let quit_i = MenuItem::with_id(app, "quit", "Quit", true, None::<&str>)?;
             let menu = Menu::with_items(app, &[&quit_i])?;
-            let tray = TrayIconBuilder::new()
+            let _tray = TrayIconBuilder::new()
                 .icon(app.default_window_icon().unwrap().clone())
                 .menu(&menu)
                 .menu_on_left_click(true)
@@ -230,9 +231,7 @@ pub fn run() {
             app.on_menu_event(move |app, event| {
                 let autostart_manager = app.autolaunch();
                 if event.id() == cust_menu.id() {
-                    let _ = app
-                        .shell()
-                        .open("https://github.com/tauri-apps/tauri", None);
+                    let _ = app.opener().open_url("https://github.com/tauri-apps/tauri", None::<&str>);
                 } else if event.id() == switch_startup.id() {
                     switch_startup
                         .set_text(switch_startup_status(&autostart_manager, true))
@@ -242,9 +241,7 @@ pub fn run() {
                         .set_text(switch_startup_status(&autostart_manager, false))
                         .expect("set text failed");
                 } else if event.id() == update_menu.id() {
-                    let _ = app
-                        .shell()
-                        .open("https://github.com/yiranzai/BackupTool/releases", None);
+                    let _ = app.opener().open_url("https://github.com/yiranzai/BackupTool/releases", None::<&str>);
                 }
             });
 

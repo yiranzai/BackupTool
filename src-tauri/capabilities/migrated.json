@@ -6,20 +6,20 @@
     "main"
   ],
   "permissions": [
-    "path:default",
-    "event:default",
-    "window:default",
-    "app:default",
-    "resources:default",
-    "menu:default",
-    "tray:default",
+    "core:path:default",
+    "core:event:default",
+    "core:window:default",
+    "core:app:default",
+    "core:resources:default",
+    "core:menu:default",
+    "core:tray:default",
     "dialog:default",
     "os:default",
     "updater:default",
     "fs:default",
     "shell:default",
     "log:default",
-    "log:default",
+    "autostart:default",
     "autostart:allow-enable",
     "autostart:allow-disable",
     "autostart:allow-is-enabled",
@@ -28,7 +28,6 @@
     "store:allow-set",
     "store:allow-save",
     "store:allow-load",
-    "autostart:default",
-    "updater:default"
+    "opener:default"
   ]
 }
